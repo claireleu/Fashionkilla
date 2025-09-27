@@ -4,3 +4,9 @@ requests
 python-dotenv
 pydantic
 typing
+pymongo
+certifi
+Pillow
+torch
+transformers
+python-multipart
