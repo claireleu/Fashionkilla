@@ -6,7 +6,7 @@ from typing import List
 API_KEY="AIzaSyCx3lnIxkHVNsBKTgMEVSbKp0SNFsE-ADE"
 ENGINE_ID="514bf44dcffb34f85"
 
-def get_top_images(prompt: str, num_images: int = 5) -> List[str]:
+def get_urls(prompt: str, num_images: int = 5) -> List[str]:
     """
     Query Google Programmable Search API to get top image URLs for a prompt.
     
@@ -56,11 +56,19 @@ def get_images_as_base64(urls: List[str]) -> List[str]:
             # Encode image content to base64
             encoded = base64.b64encode(response.content).decode("utf-8")
             base64_images.append(encoded)
-            print(f"Got image from: {url}")
+            print(f"Got prompt image from: {url}")
         except Exception as e:
             print(f"Failed to fetch {url}: {e}")
     
     return base64_images
+
+
+def convert_prompt_to_images(prompt: str, num_images: int = 5) -> List[str]:
+    list_urls = get_urls(prompt, num_images)
+    list_base64 = get_images_as_base64(list_urls)
+    return list_base64
+
+
 """""
  test_prompt = "dinner formal wear male"
     image_urls = get_top_images(test_prompt)
@@ -71,9 +79,5 @@ def get_images_as_base64(urls: List[str]) -> List[str]:
 # --- For testing the service locally ---
 if __name__ == "__main__":
     test_prompt = "winter outfit acubi"
-    image_urls = get_top_images(test_prompt)
-    print(f"Top images for '{test_prompt}':")
-    for i, url in enumerate(image_urls):
-        print(f"{i+1}: {url}")
+    convert_prompt_to_images(test_prompt)
     # image_urls = ["https://i.pinimg.com/564x/ec/da/dc/ecdadce599781e96487e27c6f7ac3040.jpg", "https://i.pinimg.com/564x/ec/da/dc/ecdadce599781e96487e27c6f7ac3040.jpg"]
-    image_base64 = get_images_as_base64(image_urls)
