@@ -1,103 +1,155 @@
+'use client';
+
 import Image from "next/image";
+import { useState } from "react";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [inputValue, setInputValue] = useState("");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      // TODO: Add functionality for handling input
+      console.log('User input:', inputValue);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    // TODO: Add functionality for suggestion buttons
+    console.log('Suggestion clicked:', suggestion);
+  };
+
+  const handleWardrobeClick = () => {
+    // TODO: Add functionality for wardrobe button
+    console.log('View wardrobe clicked');
+  };
+
+  return (
+    <div className="min-h-screen">
+      {/* Header */}
+      <header className="bg-white border-b-2 border-black px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Image
+            src="/logo.svg"
+            alt="Fashionkilla Logo"
+            width={32}
+            height={32}
+            className="image-rendering-pixelated"
+          />
+          <span className="pixel-text text-black text-lg">Fashionkilla</span>
+        </div>
+        <button className="pixel-button">
+          <div className="flex flex-col gap-1">
+            <div className="w-4 h-0.5 bg-black"></div>
+            <div className="w-4 h-0.5 bg-black"></div>
+            <div className="w-4 h-0.5 bg-black"></div>
+          </div>
+        </button>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex justify-center items-center min-h-[calc(100vh-80px)] p-8">
+        <div className="flex gap-8 max-w-6xl w-full">
+          {/* Left Card - Avatar and Bedroom Scene */}
+          <div className="bg-white border-2 border-black rounded-lg p-6 flex-1 max-w-md">
+            <div className="relative">
+              {/* Bedroom Background */}
+              <Image
+                src="/bedroom-background.svg"
+                alt="Bedroom Background"
+                width={400}
+                height={300}
+                className="w-full h-auto image-rendering-pixelated"
+              />
+              
+              {/* Avatar */}
+              <div className="absolute top-4 left-4">
+                <Image
+                  src="/avatar.svg"
+                  alt="Avatar"
+                  width={120}
+                  height={120}
+                  className="image-rendering-pixelated"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Right Card - Input and Suggestions */}
+          <div className="bg-white border-2 border-black rounded-lg p-6 flex-1 max-w-md">
+            <div className="space-y-4">
+              <h2 className="pixel-text text-black text-sm">
+                What would you like to wear today?
+              </h2>
+              
+              <input
+                type="text"
+                value={inputValue}
+                onChange={handleInputChange}
+                onKeyPress={handleKeyPress}
+                className="pixel-input w-full"
+                placeholder="Type your outfit request..."
+              />
+              
+              <div className="space-y-2">
+                <p className="pixel-text text-black text-xs">Suggestions</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => handleSuggestionClick('streetwear')}
+                    className="pixel-button text-xs"
+                  >
+                    streetwear
+                  </button>
+                  <button
+                    onClick={() => handleSuggestionClick('y2k')}
+                    className="pixel-button text-xs"
+                  >
+                    y2k
+                  </button>
+                  <button
+                    onClick={() => handleSuggestionClick('business casual')}
+                    className="pixel-button text-xs"
+                  >
+                    business casual
+                  </button>
+                  <button
+                    onClick={() => handleSuggestionClick('acubi')}
+                    className="pixel-button text-xs"
+                  >
+                    acubi
+                  </button>
+                  <button
+                    onClick={() => handleSuggestionClick('coquette')}
+                    className="pixel-button text-xs col-span-2"
+                  >
+                    coquette
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+      {/* View Wardrobe Button */}
+      <div className="absolute bottom-8 right-8">
+        <button
+          onClick={handleWardrobeClick}
+          className="pixel-button flex items-center gap-2 bg-white"
         >
           <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
+            src="/hanger.svg"
+            alt="Clothing Hanger"
             width={16}
             height={16}
+            className="image-rendering-pixelated"
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <span className="pixel-text text-xs">View wardrobe</span>
+        </button>
+      </div>
     </div>
   );
 }

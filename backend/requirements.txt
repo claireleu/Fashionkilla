@@ -10,3 +10,6 @@ Pillow
 torch
 transformers
 python-multipart
+cohere
+rembg
+cv2
