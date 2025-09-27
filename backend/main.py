@@ -18,7 +18,7 @@ last_generated_prompt: List[str] = [] #keep track of generated image prompt
 def root():
     return {"Hello" : "World"}
 
-@app.post("/generate_prompt_images", response_model=ImageResponse) #handles all of turning prompt into image
+@app.post("/submit_outfit_request", response_model=ImageResponse) #handles all of turning prompt into image
 def generate_images(request: PromptRequest): #json input
     prompt = request.prompt
     global last_generated_prompt
