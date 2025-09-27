@@ -25,32 +25,12 @@ processor = CLIPProcessor.from_pretrained(model_name)
 
 
 from services.generate_image_service import convert_prompt_to_images
+from services.recommendation_service import best_item_in_category
+from services.base64_service import image_to_base64, decode_base64_image
 
 app = FastAPI()
 
 
-# ****** Helper functions for db ********
-def image_to_base64(file: UploadFile) -> str:
-    img_bytes = file.file.read()
-    base64_string = base64.b64encode(img_bytes).decode("utf-8")
-
-    # Use the content type from the uploaded file
-    content_type = file.content_type or "image/jpeg"  # fallback
-    return f"data:{content_type};base64,{base64_string}"
-
-
-def decode_base64_image(base64_str):
-    try:
-        # Remove the prefix if it exists
-        if "," in base64_str:
-            base64_str = base64_str.split(",")[1]
-
-        image_data = base64.b64decode(base64_str)
-        return Image.open(io.BytesIO(image_data)).convert("RGB")
-    except Exception as e:
-        raise ValueError(f"Error decoding base64 image: {e}")
-    
-
 def load_reference_image(base64_str):
     try:
         reference_image = decode_base64_image(base64_str)
@@ -62,120 +42,7 @@ def load_reference_image(base64_str):
         print(f"Successfully loaded reference image (base64)")
         return reference_embedding
     except Exception as e:
-        raise Exception(f"Error processing reference image: {e}")
-
-
-def best_item_in_category(category_items, reference_embedding, category_name):
-    print(f"\n=== Evaluating {category_name} ===")
-
-    if not category_items:
-        print(f"No items in {category_name} category")
-        return None, -1.0
-    best_item, best_score = None, -1.0
-    for item in category_items:
-        try:
-            image = decode_base64_image(item["image_base64"])
-            image_input = processor(images=image, return_tensors="pt")
-            image_embedding = model.get_image_features(**image_input)
-            image_embedding = image_embedding / image_embedding.norm(
-                p=2, dim=-1, keepdim=True
-            )
-            similarity = torch.nn.functional.cosine_similarity(
-                reference_embedding, image_embedding
-            )
-            print(f"item {item['name']}: {similarity}")
-            score = similarity.item()
-            if score > best_score:
-                best_score = score
-                best_item = item
-        except Exception as e:
-            print(f"Error processing {item['name']}: {e}")
-    if best_item:
-        print(f"Best {category_name}: {best_item['name']} (score: {best_score:.4f})")
-    else:
-        print(f"No valid items found in {category_name}")
-    return best_item, best_score
-
-
-def serialize_item(item):
-    if not item:
-        return None
-    return {**item, "_id": str(item["_id"])}
-
-
-
-# ****** Helper functions for db ********
-def image_to_base64(file: UploadFile) -> str:
-    img_bytes = file.file.read()
-    base64_string = base64.b64encode(img_bytes).decode("utf-8")
-
-    # Use the content type from the uploaded file
-    content_type = file.content_type or "image/jpeg"  # fallback
-    return f"data:{content_type};base64,{base64_string}"
-
-
-def decode_base64_image(base64_str):
-    try:
-        # Remove the prefix if it exists
-        if "," in base64_str:
-            base64_str = base64_str.split(",")[1]
-
-        image_data = base64.b64decode(base64_str)
-        return Image.open(io.BytesIO(image_data)).convert("RGB")
-    except Exception as e:
-        raise ValueError(f"Error decoding base64 image: {e}")
-    
-
-def load_reference_image(base64_str):
-    try:
-        reference_image = decode_base64_image(base64_str)
-        image_input = processor(images=reference_image, return_tensors="pt")
-        reference_embedding = model.get_image_features(**image_input)
-        reference_embedding = reference_embedding / reference_embedding.norm(
-            p=2, dim=-1, keepdim=True
-        )
-        print(f"Successfully loaded reference image (base64)")
-        return reference_embedding
-    except Exception as e:
-        raise Exception(f"Error processing reference image: {e}")
-
-
-def best_item_in_category(category_items, reference_embedding, category_name):
-    print(f"\n=== Evaluating {category_name} ===")
-
-    if not category_items:
-        print(f"No items in {category_name} category")
-        return None, -1.0
-    best_item, best_score = None, -1.0
-    for item in category_items:
-        try:
-            image = decode_base64_image(item["image_base64"])
-            image_input = processor(images=image, return_tensors="pt")
-            image_embedding = model.get_image_features(**image_input)
-            image_embedding = image_embedding / image_embedding.norm(
-                p=2, dim=-1, keepdim=True
-            )
-            similarity = torch.nn.functional.cosine_similarity(
-                reference_embedding, image_embedding
-            )
-            print(f"item {item['name']}: {similarity}")
-            score = similarity.item()
-            if score > best_score:
-                best_score = score
-                best_item = item
-        except Exception as e:
-            print(f"Error processing {item['name']}: {e}")
-    if best_item:
-        print(f"Best {category_name}: {best_item['name']} (score: {best_score:.4f})")
-    else:
-        print(f"No valid items found in {category_name}")
-    return best_item, best_score
-
-
-def serialize_item(item):
-    if not item:
-        return None
-    return {**item, "_id": str(item["_id"])}
+        raise Exception(f"Error processing reference image: {e}")      
 
 
 class PromptRequest(BaseModel): # string: user asks for outfit based on this scenario
