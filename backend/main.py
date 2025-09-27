@@ -50,9 +50,7 @@ def submit_outfit_request(prompt: PromptRequest):
     best_items, scores = recommend_best_items(
         last_generated_prompt, closet, get_event_description_from_image
     )
-    return JSONResponse(
-        {"outfit": best_items, "scores": scores}
-    )
+    return JSONResponse({"outfit": best_items, "scores": scores})
 
 
 @app.get(

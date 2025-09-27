@@ -1,11 +1,14 @@
 import base64
 import certifi
+import os
 from pymongo import MongoClient
+from dotenv import load_dotenv
 from bson import ObjectId
 from services.gemini_service import extract_keywords_with_gemini
 
+load_dotenv()
 
-MONGO_URI = ""
+MONGO_URI = os.getenv("MONGODB_CONNECTION_STR")
 client = MongoClient(MONGO_URI, tlsCAFile=certifi.where())
 db = client["outfitDB"]
 clothes_collection = db["clothes"]

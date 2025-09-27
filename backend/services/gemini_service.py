@@ -1,10 +1,11 @@
 from google import genai
 import json
 import os
+from dotenv import load_dotenv
 
-gemini_client = genai.Client(api_key="AIzaSyDBom4TCnt2QVDKavdmLP0vm846akOTgSY")
-os.environ["GOOGLE_API_KEY"] = "YOUR_GEMINI_API_KEY"
-gemini_client = genai.Client(api_key="AIzaSyDBom4TCnt2QVDKavdmLP0vm846akOTgSY")
+load_dotenv()
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+gemini_client = genai.Client(api_key=GEMINI_API_KEY)
 
 
 def extract_keywords_with_gemini(img_bytes: bytes) -> dict:
@@ -62,5 +63,5 @@ def get_event_description_from_image(img_bytes: bytes) -> str:
             }
         ],
     )
-    
+
     return response.text.strip()
