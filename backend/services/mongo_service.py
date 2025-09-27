@@ -5,7 +5,7 @@ from bson import ObjectId
 from services.gemini_service import extract_keywords_with_gemini
 
 
-MONGO_URI = "mongodb+srv://outfitDB:technova25@fashionkilla.mllcjg1.mongodb.net/?retryWrites=true&w=majority&appName=fashionkilla"
+MONGO_URI = ""
 client = MongoClient(MONGO_URI, tlsCAFile=certifi.where())
 db = client["outfitDB"]
 clothes_collection = db["clothes"]
