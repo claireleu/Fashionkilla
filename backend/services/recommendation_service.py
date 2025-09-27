@@ -1,41 +1,52 @@
-import torch
-from PIL import Image
-from transformers import CLIPProcessor, CLIPModel
-import io
-from services.generate_image_service import decode_base64_image
-model = CLIPModel.from_pretrained("patrickjohncyh/fashion-clip")
-processor = CLIPProcessor.from_pretrained("patrickjohncyh/fashion-clip")
+from sentence_transformers import SentenceTransformer, util
+import base64
 
 
-def best_item_in_category(category_items, reference_embedding, category_name):
-    print(f"\n=== Evaluating {category_name} ===")
+text_model = SentenceTransformer("all-MiniLM-L6-v2")
 
-    if not category_items:
-        print(f"No items in {category_name} category")
-        return None, -1.0
-    best_item, best_score = None, -1.0
-    for item in category_items:
-        try:
-            image = decode_base64_image(item["image_base64"])
-            image_input = processor(images=image, return_tensors="pt")
-            image_embedding = model.get_image_features(**image_input)
-            image_embedding = image_embedding / image_embedding.norm(
-                p=2, dim=-1, keepdim=True
+
+def recommend_best_items(
+    last_generated_prompt: list, closet: dict, get_event_description_from_image
+):
+    """ """
+    image_embeddings = []
+    for img_base64 in last_generated_prompt:
+        img_bytes = base64.b64decode(img_base64.split(",")[-1])
+        event_description = get_event_description_from_image(img_bytes)
+        embedding = text_model.encode(event_description, convert_to_tensor=True)
+        image_embeddings.append((embedding, event_description))
+
+    best_items = {}
+    scores_per_cat = {cat: 0.0 for cat in closet.keys()}
+
+    for category, items_list in closet.items():
+        max_score = 0
+        best_item = None
+        for item in items_list:
+            item_embedding = text_model.encode(
+                item.get("keywords", ""), convert_to_tensor=True
             )
-            similarity = torch.nn.functional.cosine_similarity(
-                reference_embedding, image_embedding
+            max_item_score = max(
+                util.cos_sim(item_embedding, img_emb[0]).item()
+                for img_emb in image_embeddings
             )
-            print(f"item {item['name']}: {similarity}")
-            score = similarity.item()
-            if score > best_score:
-                best_score = score
+            if max_item_score > max_score:
+                max_score = max_item_score
                 best_item = item
-        except Exception as e:
-            print(f"Error processing {item['name']}: {e}")
-    if best_item:
-        print(f"Best {category_name}: {best_item['name']} (score: {best_score:.4f})")
-    else:
-        print(f"No valid items found in {category_name}")
-    return best_item, best_score
+        if best_item:
+            best_items[category] = best_item
+            scores_per_cat[category] = max_score
 
-    
+    dress_score = scores_per_cat.get("dress", 0.0)
+    top_score = scores_per_cat.get("top", 0.0)
+    bottom_score = scores_per_cat.get("bottom", 0.0)
+    avg_top_bottom = (top_score + bottom_score) / 2
+
+    if "dress" in best_items and dress_score > avg_top_bottom:
+        # Return only dress if dress score higher than average of top + bottom
+        best_items = {"dress": best_items["dress"]}
+    else:
+        # Otherwise return top + bottom outfit
+        best_items = {k: v for k, v in best_items.items() if k in ["top", "bottom"]}
+
+    return best_items, scores_per_cat
