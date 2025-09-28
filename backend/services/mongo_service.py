@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from bson import ObjectId
 from services.gemini_service import extract_keywords_with_gemini
 from sentence_transformers import SentenceTransformer
+from datetime import datetime, timezone
 
 
 text_model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -47,7 +48,7 @@ def get_image_by_id(item_id: str):
 
 def get_all_clothing():
     """
-    Retrieve all clothing items from the collection
+    Return all clothing items from the collection
     """
     items = list(clothes_collection.find())
     for item in items:
@@ -57,7 +58,7 @@ def get_all_clothing():
 
 def get_closet_grouped():
     """
-    Retrieve all clothing items grouped by category
+    Return all clothing items grouped by category
     """
     items = get_all_clothing()
     closet = {cat: [] for cat in ALLOWED_CATEGORIES}
@@ -71,7 +72,7 @@ def get_closet_grouped():
 
 def get_closet_grouped_no_embeddings():
     """
-    Retrieve all clothing items grouped by category except embedded vectors
+    Return all clothing items grouped by category except embedded vectors
     """
     items = get_all_clothing()
     closet = {cat: [] for cat in ALLOWED_CATEGORIES}
@@ -113,6 +114,7 @@ def create_clothing_item(file_bytes: bytes, content_type: str):
         "category": category,
         "keywords": metadata.get("keywords", ""),
         "text_embedding": text_embedding.tolist(),
+        "created_at": datetime.now(timezone.utc),
         "image_base64": img_data_uri,
     }
 
@@ -132,3 +134,28 @@ def update_text_embedding(obj_id: str, embedding: list[float]):
     return clothes_collection.update_one(
         {"_id": mongo_id}, {"$set": {"text_embedding": embedding}}
     )
+
+
+def get_sorted_time_closet():
+    """
+    Return all clothing items sorted by created_at time (newest first).
+    Items without created_at appear last in database order
+    """
+    items_with_time = list(clothes_collection.find(
+        {"created_at": {"$exists": True, "$ne": None}},
+        {"text_embedding": 0}
+    ).sort("created_at", -1))
+
+    items_without_time = list(clothes_collection.find(
+        {"$or": [
+            {"created_at": {"$exists": False}},
+            {"created_at": None}
+        ]},
+        {"text_embedding": 0}
+    ))
+
+    all_items = items_with_time + items_without_time
+    for item in all_items:
+        item["_id"] = str(item["_id"])
+    
+    return all_items

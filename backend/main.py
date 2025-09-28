@@ -12,6 +12,7 @@ from services.mongo_service import (
     serialize_item,
     create_clothing_item,
     get_image_by_id,
+    get_sorted_time_closet
 )
 from services.recommendation_service import recommend_best_items
 from services.gemini_service import (
@@ -92,6 +93,11 @@ async def upload_outfit(
 @app.get("/closet")
 async def get_closet():
     return get_closet_grouped_no_embeddings()
+
+
+@app.get("/sorted_closet")
+async def get_sorted_closet():
+    return get_sorted_time_closet()
 
 
 # delete clothing item
