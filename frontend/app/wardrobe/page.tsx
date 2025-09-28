@@ -21,7 +21,7 @@ const LoadingAnimation = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentImage(prev => prev === 1 ? 2 : 1);
+      setCurrentImage((prev) => (prev === 1 ? 2 : 1));
     }, 500); // Switch every 500ms
 
     return () => clearInterval(interval);
@@ -37,7 +37,9 @@ const LoadingAnimation = () => {
           height={120}
           className="animate-pulse"
         />
-        <p className="text-white text-xl font-pixel mt-4">Uploading your item...</p>
+        <p className="text-white text-xl font-pixel mt-4">
+          Uploading your item...
+        </p>
       </div>
     </div>
   );
@@ -52,6 +54,7 @@ export default function Wardrobe() {
   const [activeTab, setActiveTab] = useState<
     "all" | "top" | "bottom" | "dress"
   >("all");
+  const [clothesLoading, setClothesLoading] = useState(false);
 
   const handleNavigateToMain = () => {
     router.push("/main");
@@ -59,11 +62,14 @@ export default function Wardrobe() {
 
   const fetchCloset = async () => {
     try {
+      setClothesLoading(true);
       const res = await fetch("/api/sorted_closet");
       const data = await res.json();
       setCloset(data);
     } catch (err) {
       console.error("Failed to fetch closet:", err);
+    } finally {
+      setClothesLoading(false);
     }
   };
 
@@ -116,7 +122,7 @@ export default function Wardrobe() {
     <div className="min-h-screen bg-striped relative">
       <header className="w-full flex justify-between items-center p-6 bg-white shadow-md mb-8">
         <div className="flex items-center">
-          <button 
+          <button
             onClick={handleNavigateToMain}
             className="hover:opacity-80 transition-opacity cursor-pointer"
           >
@@ -166,7 +172,7 @@ export default function Wardrobe() {
             />
           ))}
         </div>
-        {filteredCloset?.length === 0 && (
+        {filteredCloset?.length === 0 && !clothesLoading && (
           <div className="text-center py-12 w-full h-full">
             <p className="text-gray-500 text-lg">
               This section of your closet is empty
@@ -177,7 +183,7 @@ export default function Wardrobe() {
       </div>
 
       {/* Show message if no items */}
-      {closet.length === 0 && (
+      {clothesLoading && closet.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500 text-lg">Your closet is empty</p>
           <p className="text-gray-400">Add some items to get started!</p>
