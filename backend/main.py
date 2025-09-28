@@ -7,12 +7,13 @@ from services.generate_image_service import convert_prompt_to_images
 from services.mongo_service import (
     delete_clothing,
     get_closet_grouped,
+    get_closet_grouped_no_embeddings,
     serialize_item,
     create_clothing_item,
 )
 from services.recommendation_service import recommend_best_items
 from services.gemini_service import (
-    get_event_description_from_image,
+    get_generated_image_description,
 )
 
 
@@ -48,7 +49,7 @@ def submit_outfit_request(prompt: PromptRequest):
     closet = get_closet_grouped()
     # calculate best matching clothing for each category
     best_items, scores = recommend_best_items(
-        last_generated_prompt, closet, get_event_description_from_image
+        last_generated_prompt, closet, get_generated_image_description
     )
     return JSONResponse({"outfit": best_items, "scores": scores})
 
@@ -80,7 +81,7 @@ async def upload_outfit(
 # get closet grouped by category
 @app.get("/closet")
 async def get_closet():
-    return get_closet_grouped()
+    return get_closet_grouped_no_embeddings()
 
 
 # delete clothing item
