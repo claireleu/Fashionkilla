@@ -34,6 +34,16 @@ def delete_clothing(item_id: str):
     obj_id = ObjectId(item_id)
     return clothes_collection.delete_one({"_id": obj_id})
 
+def get_image_by_id(item_id: str):
+    """
+    Get a clothing item's image from the collction by its ObjectId
+    """
+    obj_id = ObjectId(item_id)
+    doc = clothes_collection.find_one({"_id": obj_id}, {"image_base64": 1, "_id":0})
+    if doc:
+        return doc.get("image_base64")
+    return None
+
 
 def get_all_clothing():
     """
@@ -89,7 +99,7 @@ def create_clothing_item(file_bytes: bytes, content_type: str):
     metadata = extract_keywords_with_gemini(file_bytes)
     category = metadata.get("category")
     if category not in ALLOWED_CATEGORIES:
-        category = "top"
+        category = "top" #change
 
     img_base64 = base64.b64encode(file_bytes).decode("utf-8")
     img_data_uri = f"data:{content_type or 'image/jpeg'};base64,{img_base64}"
