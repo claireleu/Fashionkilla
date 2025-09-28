@@ -13,9 +13,7 @@ class PromptRequest(BaseModel):  # string: user asks for outfit based on this sc
 
 
 def recommend_best_items(
-    last_generated_prompt: list,
     closet: dict,
-    get_generated_image_description,
     prompt: PromptRequest,
 ):
     """
@@ -24,14 +22,7 @@ def recommend_best_items(
     Computes semantic similarity between embeddings of the generated outfit images and each item's keywords.
     Returns the top-matching items per category (top, bottom, dress) with their similarity scores.
     """
-    image_embeddings = []
-    for img_base64 in last_generated_prompt:
-        img_bytes = base64.b64decode(img_base64.split(",")[-1])
-        event_description = (
-            prompt.prompt + " - " + get_generated_image_description(img_bytes)
-        )
-        embedding = text_model.encode(event_description, convert_to_tensor=True)
-        image_embeddings.append(embedding)
+    prompt_emb = text_model.encode(prompt.prompt, convert_to_tensor=True)
 
     best_items = {}
     scores_per_cat = {cat: 0.0 for cat in closet.keys()}
@@ -53,12 +44,9 @@ def recommend_best_items(
                 item_embedding = text_model.encode(keywords, convert_to_tensor=True)
                 # Save embedding back to DB (cache it)
                 update_text_embedding(item["_id"], item_embedding.cpu().tolist())
-            max_item_score = max(
-                util.cos_sim(item_embedding, img_emb).item()
-                for img_emb in image_embeddings
-            )
-            if max_item_score > max_score:
-                max_score = max_item_score
+            score = util.cos_sim(item_embedding, prompt_emb).item()
+            if score > max_score:
+                max_score = score
                 best_item = item
 
         # Make a copy and remove embeddings before returning

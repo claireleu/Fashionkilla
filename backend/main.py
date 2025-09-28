@@ -55,12 +55,12 @@ def root():
 # handles all of turning prompt into image
 @app.post("/submit_outfit_request")
 def submit_outfit_request(prompt: PromptRequest):
-    global last_generated_prompt
-    last_generated_prompt = convert_prompt_to_images(prompt.prompt)[:5]
+    #global last_generated_prompt
+    #last_generated_prompt = convert_prompt_to_images(prompt.prompt)[:5]
     closet = get_closet_grouped()
     # calculate best matching clothing for each category
     best_items, scores = recommend_best_items(
-        last_generated_prompt, closet, get_generated_image_description, prompt
+        closet, prompt
     )
     return JSONResponse({"outfit": best_items, "scores": scores})
 
