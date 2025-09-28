@@ -10,10 +10,27 @@ export default function Home() {
     setInputValue(e.target.value);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      // TODO: Add functionality for handling input
-      console.log('User input:', inputValue);
+  const handleKeyPress = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && inputValue.trim() !== "") {
+      try {
+        const response = await fetch("http://localhost:8000/submit_outfit_request", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({prompt: inputValue}),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to send prompt");
+        }
+
+        const data = await response.json();
+        console.log("Backend response:", data);
+  
+      } catch (error) {
+        console.error("Error:", error);
+      }
     }
   };
 

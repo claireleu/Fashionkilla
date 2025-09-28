@@ -2,6 +2,7 @@ from fastapi import FastAPI, File, UploadFile, HTTPException
 from pydantic import BaseModel
 from typing import List
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from sentence_transformers import SentenceTransformer
 from services.generate_image_service import convert_prompt_to_images
 from services.mongo_service import (
@@ -21,6 +22,14 @@ from services.gemini_service import (
 text_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class PromptRequest(BaseModel):  # string: user asks for outfit based on this scenario
