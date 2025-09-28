@@ -7,6 +7,7 @@ from bson import ObjectId
 from services.gemini_service import extract_keywords_with_gemini
 from sentence_transformers import SentenceTransformer
 from datetime import datetime, timezone
+from fastapi.encoders import jsonable_encoder
 
 
 text_model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -35,12 +36,13 @@ def delete_clothing(item_id: str):
     obj_id = ObjectId(item_id)
     return clothes_collection.delete_one({"_id": obj_id})
 
+
 def get_image_by_id(item_id: str):
     """
     Get a clothing item's image from the collction by its ObjectId
     """
     obj_id = ObjectId(item_id)
-    doc = clothes_collection.find_one({"_id": obj_id}, {"image_base64": 1, "_id":0})
+    doc = clothes_collection.find_one({"_id": obj_id}, {"image_base64": 1, "_id": 0})
     if doc:
         return doc.get("image_base64")
     return None
@@ -53,7 +55,7 @@ def get_all_clothing():
     items = list(clothes_collection.find())
     for item in items:
         item["_id"] = str(item["_id"])
-    return items
+    return jsonable_encoder(items)
 
 
 def get_closet_grouped():
@@ -66,7 +68,7 @@ def get_closet_grouped():
         closet[item["category"]].append(item)
     for item in items:
         print(item["name"])
-    
+
     return closet
 
 
@@ -100,7 +102,7 @@ def create_clothing_item(file_bytes: bytes, content_type: str):
     metadata = extract_keywords_with_gemini(file_bytes)
     category = metadata.get("category")
     if category not in ALLOWED_CATEGORIES:
-        category = "top" #change
+        category = "top"  # change
 
     img_base64 = base64.b64encode(file_bytes).decode("utf-8")
     img_data_uri = f"data:{content_type or 'image/jpeg'};base64,{img_base64}"
@@ -141,21 +143,21 @@ def get_sorted_time_closet():
     Return all clothing items sorted by created_at time (newest first).
     Items without created_at appear last in database order
     """
-    items_with_time = list(clothes_collection.find(
-        {"created_at": {"$exists": True, "$ne": None}},
-        {"text_embedding": 0}
-    ).sort("created_at", -1))
+    items_with_time = list(
+        clothes_collection.find(
+            {"created_at": {"$exists": True, "$ne": None}}, {"text_embedding": 0}
+        ).sort("created_at", -1)
+    )
 
-    items_without_time = list(clothes_collection.find(
-        {"$or": [
-            {"created_at": {"$exists": False}},
-            {"created_at": None}
-        ]},
-        {"text_embedding": 0}
-    ))
+    items_without_time = list(
+        clothes_collection.find(
+            {"$or": [{"created_at": {"$exists": False}}, {"created_at": None}]},
+            {"text_embedding": 0},
+        )
+    )
 
     all_items = items_with_time + items_without_time
     for item in all_items:
         item["_id"] = str(item["_id"])
-    
-    return all_items
+
+    return jsonable_encoder(all_items)
