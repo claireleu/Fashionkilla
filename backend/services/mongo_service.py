@@ -7,6 +7,7 @@ from bson import ObjectId
 from services.gemini_service import extract_keywords_with_gemini
 from sentence_transformers import SentenceTransformer
 
+
 text_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 load_dotenv()
@@ -109,3 +110,16 @@ def create_clothing_item(file_bytes: bytes, content_type: str):
     item["_id"] = str(result.inserted_id)
     print(item["name"])
     return item
+
+
+def update_text_embedding(obj_id: str, embedding: list[float]):
+    """
+    Update the text_embedding of a clothing item in MongoDB
+    """
+    # Convert torch.Tensor to list if needed
+    mongo_id = ObjectId(obj_id)
+
+    return clothes_collection.update_one(
+        {"_id": mongo_id},
+        {"$set": {"text_embedding": embedding}}
+    )

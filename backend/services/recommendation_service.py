@@ -1,13 +1,22 @@
-from sentence_transformers import SentenceTransformer, util
 import base64
 import torch
 import copy
+from sentence_transformers import SentenceTransformer, util
+from services.mongo_service import update_text_embedding
+from pydantic import BaseModel
 
 text_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 
+class PromptRequest(BaseModel):  # string: user asks for outfit based on this scenario
+    prompt: str
+
+
 def recommend_best_items(
-    last_generated_prompt: list, closet: dict, get_generated_image_description
+    last_generated_prompt: list,
+    closet: dict,
+    get_generated_image_description,
+    prompt: PromptRequest,
 ):
     """
     Recommend the best matching clothing items from a user's closet based on generated outfit images.
@@ -18,7 +27,9 @@ def recommend_best_items(
     image_embeddings = []
     for img_base64 in last_generated_prompt:
         img_bytes = base64.b64decode(img_base64.split(",")[-1])
-        event_description = get_generated_image_description(img_bytes)
+        event_description = (
+            prompt.prompt + " - " + get_generated_image_description(img_bytes)
+        )
         embedding = text_model.encode(event_description, convert_to_tensor=True)
         image_embeddings.append(embedding)
 
@@ -32,11 +43,16 @@ def recommend_best_items(
             keywords = item.get("keywords", "").strip()
             if not item.get("text_embedding") and not keywords:
                 continue
-            item_embedding = (
-                torch.tensor(item["text_embedding"], device=text_model.device)
-                if item.get("text_embedding") and len(item["text_embedding"]) > 0
-                else text_model.encode(item.get("keywords", ""), convert_to_tensor=True)
-            )
+            if item.get("text_embedding") and len(item["text_embedding"]) > 0:
+                # Use cached embedding
+                item_embedding = torch.tensor(
+                    item["text_embedding"], device=text_model.device
+                )
+            else:
+                # Compute embedding from keywords
+                item_embedding = text_model.encode(keywords, convert_to_tensor=True)
+                # Save embedding back to DB (cache it)
+                update_text_embedding(item["_id"], item_embedding.cpu().tolist())
             max_item_score = max(
                 util.cos_sim(item_embedding, img_emb).item()
                 for img_emb in image_embeddings

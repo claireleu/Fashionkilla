@@ -13,56 +13,41 @@
   --font-mono: var(--font-geist-mono);
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+@font-face {
+  font-family: "Pixel";
+  src: url("/fonts//PixelifySans-VariableFont_wght.ttf") format("truetype");
+}
 
 body {
-  background: repeating-linear-gradient(
-    90deg,
-    #ffb6c1 0px,
-    #ffb6c1 20px,
-    #ffffff 20px,
-    #ffffff 40px
-  );
-  color: var(--foreground);
-  font-family: 'Press Start 2P', monospace;
   margin: 0;
-  padding: 0;
-  min-height: 100vh;
+  font-family: "Pixel", sans-serif;
 }
 
-/* Pixel art styling */
-.pixel-text {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 12px;
-  line-height: 1.5;
-  image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: crisp-edges;
+.bg-striped {
+  background: repeating-linear-gradient(
+    to right,
+    #FFEAEC, /* Light pink */
+    #FFEAEC 30px,
+    rgba(222, 200, 187, 0.532) 30px, /* Beige */
+    rgba(222, 200, 187, 0.532) 45px
+  );
 }
 
-.pixel-button {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 10px;
-  border: 2px solid #000;
-  background: #f0f0f0;
-  padding: 8px 12px;
-  cursor: pointer;
-  transition: all 0.1s ease;
+.bg-beige {
+  background-color: #d4bfa3;
 }
 
-.pixel-button:hover {
-  background: #e0e0e0;
-  transform: translateY(-1px);
+.bg-beige-dark {
+  background-color: #e0d1b3;
 }
 
-.pixel-input {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 10px;
-  border: 2px solid #000;
-  background: #ffffff;
-  padding: 8px 12px;
-  outline: none;
-}
-
-.pixel-input:focus {
-  border-color: #ffb6c1;
+.text-link-blue {
+  color: #138CDE;
 }
