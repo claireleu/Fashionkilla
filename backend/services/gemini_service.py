@@ -45,7 +45,7 @@ def extract_keywords_with_gemini(img_bytes: bytes) -> dict:
         return {"keywords": raw_text, "category": None, "name": None}
 
 
-def get_event_description_from_image(img_bytes: bytes) -> str:
+def get_generated_image_description(img_bytes: bytes) -> str:
     """
     Send an event image to Gemini and get a textual description / keywords.
     """

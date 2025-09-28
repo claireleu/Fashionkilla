@@ -8,7 +8,7 @@ load_dotenv()
 
 # Replace with your own API key and Custom Search Engine ID
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-SEARCH_ENGINE_ID = os.getenv("ENGINE_ID")
+SEARCH_ENGINE_ID = os.getenv("SEARCH_ENGINE_ID")
 
 
 def get_urls(prompt: str, num_images: int = 5) -> List[str]:
