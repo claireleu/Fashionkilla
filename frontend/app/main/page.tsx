@@ -47,8 +47,8 @@ export default function MainPage() {
         ]);
 
         setOutfitImages({ top: topImg || "", bottom: bottomImg || "" });
-        console.log("got top image", topImg);
-        console.log("got bottom image", bottomImg);
+        //console.log("got top image", topImg);
+        //console.log("got bottom image", bottomImg);
 
         setDressImage({}); // clear any previous dress
 
@@ -57,7 +57,7 @@ export default function MainPage() {
 
         const dressImg = await fetchImageById(data.outfit.dress._id);
         setDressImage({ dress: dressImg || "" });
-        console.log("got dress image", dressImg);
+        //console.log("got dress image", dressImg);
         setOutfitImages({}); // clear any previous top/bottom
       }
 

@@ -11,7 +11,7 @@ gemini_client = genai.Client(api_key=GEMINI_API_KEY)
 def extract_keywords_with_gemini(img_bytes: bytes) -> dict:
     """Send image to Gemini and get structured clothing metadata"""
     response = gemini_client.models.generate_content(
-        model="gemini-2.5-flash-lite",  # note full path
+        model="gemini-2.5-flash",  # note full path
         contents=[
             {
                 "role": "user",
@@ -50,7 +50,7 @@ def get_generated_image_description(img_bytes: bytes) -> str:
     Send an event image to Gemini and get a textual description / keywords.
     """
     response = gemini_client.models.generate_content(
-        model="gemini-2.5-flash-lite",
+        model="gemini-2.5-flash",
         contents=[
             {
                 "role": "user",
