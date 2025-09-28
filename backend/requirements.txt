@@ -10,6 +10,7 @@ Pillow
 torch
 transformers
 python-multipart
+google-genai
+sentence-transformers
 cohere
 rembg
-cv2
