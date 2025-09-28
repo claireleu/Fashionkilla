@@ -10,10 +10,6 @@ load_dotenv()
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 SEARCH_ENGINE_ID = os.getenv("SEARCH_ENGINE_ID")
 
-#GOOGLE_API_KEY = "AIzaSyCx3lnIxkHVNsBKTgMEVSbKp0SNFsE-ADE"
-#SEARCH_ENGINE_ID = "514bf44dcffb34f85"
-
-
 
 def get_urls(prompt: str, num_images: int = 5) -> List[str]:
     """

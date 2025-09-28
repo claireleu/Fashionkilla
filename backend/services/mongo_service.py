@@ -5,6 +5,9 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 from bson import ObjectId
 from services.gemini_service import extract_keywords_with_gemini
+from sentence_transformers import SentenceTransformer
+
+text_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 load_dotenv()
 
@@ -55,6 +58,20 @@ def get_closet_grouped():
     return closet
 
 
+def get_closet_grouped_no_embeddings():
+    """
+    Retrieve all clothing items grouped by category except embedded vectors
+    """
+    items = get_all_clothing()
+    closet = {cat: [] for cat in ALLOWED_CATEGORIES}
+    for item in items:
+        if "text_embedding" in item:
+            del item["text_embedding"]
+        closet[item["category"]].append(item)
+
+    return closet
+
+
 def serialize_item(item: dict):
     """
     Serialize a MongoDB item dictionary by converting its "_id" to a string
@@ -76,10 +93,15 @@ def create_clothing_item(file_bytes: bytes, content_type: str):
     img_base64 = base64.b64encode(file_bytes).decode("utf-8")
     img_data_uri = f"data:{content_type or 'image/jpeg'};base64,{img_base64}"
 
+    # cache text vector embeddings
+    keywords = metadata.get("keywords", "")
+    text_embedding = text_model.encode(keywords, convert_to_tensor=False)
+
     item = {
         "name": metadata.get("name", "Unknown"),
         "category": category,
         "keywords": metadata.get("keywords", ""),
+        "text_embedding": text_embedding.tolist(),
         "image_base64": img_data_uri,
     }
 
