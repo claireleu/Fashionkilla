@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState, ChangeEvent, FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import ClothingCard from "../components/ClothingCard";
 import { Plus } from "lucide-react";
 
@@ -14,7 +15,36 @@ export interface ClosetItem {
   image_base64: string;
 }
 
+// Loading Animation Component
+const LoadingAnimation = () => {
+  const [currentImage, setCurrentImage] = useState(1);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImage(prev => prev === 1 ? 2 : 1);
+    }, 500); // Switch every 500ms
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="flex flex-col items-center">
+        <Image
+          src={`/bunny_loading_${currentImage}.png`}
+          alt="Loading..."
+          width={120}
+          height={120}
+          className="animate-pulse"
+        />
+        <p className="text-white text-xl font-pixel mt-4">Uploading your item...</p>
+      </div>
+    </div>
+  );
+};
+
 export default function Wardrobe() {
+  const router = useRouter();
   const [closet, setCloset] = useState<ClosetItem[]>([]);
   const [showUpload, setShowUpload] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -22,6 +52,10 @@ export default function Wardrobe() {
   const [activeTab, setActiveTab] = useState<
     "all" | "top" | "bottom" | "dress"
   >("all");
+
+  const handleNavigateToMain = () => {
+    router.push("/main");
+  };
 
   const fetchCloset = async () => {
     try {
@@ -82,12 +116,17 @@ export default function Wardrobe() {
     <div className="min-h-screen bg-striped relative">
       <header className="w-full flex justify-between items-center p-6 bg-white shadow-md mb-8">
         <div className="flex items-center">
-          <Image
-            src="/bunny-icon.png"
-            alt="Bunny Icon"
-            width={60}
-            height={60}
-          />
+          <button 
+            onClick={handleNavigateToMain}
+            className="hover:opacity-80 transition-opacity cursor-pointer"
+          >
+            <Image
+              src="/bunny-icon.png"
+              alt="Bunny Icon"
+              width={80}
+              height={80}
+            />
+          </button>
           <p className="text-2xl font-pixel ml-2">Fashionkilla Closet</p>
         </div>
       </header>
@@ -180,6 +219,9 @@ export default function Wardrobe() {
           </form>
         </div>
       )}
+      {/* Loading Animation */}
+      {loadingUpload && <LoadingAnimation />}
+
       {/* Upload button */}
       <div
         className="fixed left-1/2 bottom-5 transform -translate-x-1/2 bg-[#FFEAEC] rounded-2xl shadow-xl flex flex-col items-center justify-center p-4 cursor-pointer hover:bg-[#e8d7d8] transition border-[1.5px] border-black"
