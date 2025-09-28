@@ -53,12 +53,12 @@ export default function ClothingCard({ item, onDelete }: ClothingCardProps) {
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col items-center p-4">
+      <div className="bg-[#FFF7F8] rounded-lg shadow-lg overflow-hidden flex flex-col items-center p-4 border-[1.5px] border-[#eedcdc]">
         {item.image_base64 ? (
           <img
             src={item.image_base64}
             alt={item.name}
-            className="rounded-lg w-full h-52 object-cover mb-4"
+            className="rounded-lg w-full h-72 object-cover mb-4"
           />
         ) : (
           <div className="w-full h-48 bg-gray-200 flex items-center justify-center mb-4">
@@ -70,7 +70,7 @@ export default function ClothingCard({ item, onDelete }: ClothingCardProps) {
           onClick={handleDeleteClick}
         >
           <p className="text-lg font-semibold">{item.name}</p>
-          <Trash2 className="text-red-400 w-6 h-6 group-hover:text-red-600 transition-colors" />
+          <Trash2 className="text-[#d0a9a9] w-6 h-6 group-hover:text-[#947979] transition-colors" />
         </button>
       </div>
 
