@@ -11,6 +11,8 @@ export const POST = async (req: Request) => {
     const forwardData = new FormData();
     forwardData.append("file", file, file.name);
 
+    console.log("trying file upload to mongo")
+
     const res = await fetch("http://localhost:8000/upload", {
       method: "POST",
       body: forwardData,
