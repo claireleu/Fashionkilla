@@ -135,7 +135,7 @@ export default function Wardrobe() {
         onClick={() => setShowUpload(true)}
       >
         <span className="text-4xl text-black">+</span>
-        <span className="text-black text-sm">Add Item</span>
+        <span className="text-black font-semibold">Add Item</span>
       </div>
     </div>
   );
