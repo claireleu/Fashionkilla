@@ -35,8 +35,8 @@ body {
     to right,
     #FFEAEC, /* Light pink */
     #FFEAEC 30px,
-    rgba(222, 200, 187, 0.532) 30px, /* Beige */
-    rgba(222, 200, 187, 0.532) 45px
+    rgba(240, 208, 200, 0.532) 30px, /* Beige */
+    rgba(240, 208, 200, 0.532) 45px
   );
 }
 

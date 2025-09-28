@@ -151,18 +151,28 @@ export default function MainPage() {
                 // Show top and bottom
                 <>
                   {outfitImages.top && (
-                    <img
-                      src={outfitImages.top}
-                      alt="Top"
-                      className="max-h-48 mx-auto mb-4"
-                    />
+                    <div className="relative group max-h-48 mx-auto mb-4">
+                      <img
+                        src={outfitImages.top}
+                        alt="Top"
+                        className="max-h-48 mx-auto"
+                      />
+                      <span className="absolute top-1/2 right-1/2 transform -translate-x-1/2 mb-2 w-max px-3 py-1 bg-white text-black text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                        {responseData.outfit.top.name}
+                      </span>
+                    </div>
                   )}
                   {outfitImages.bottom && (
-                    <img
-                      src={outfitImages.bottom}
-                      alt="Bottom"
-                      className="max-h-48 mx-auto"
-                    />
+                    <div className="relative group max-h-48 mx-auto">
+                      <img
+                        src={outfitImages.bottom}
+                        alt="Bottom"
+                        className="max-h-48 mx-auto"
+                      />
+                      <span className="absolute top-1/2 left-4/3 transform -translate-x-1/2 mb-2 w-max px-3 py-1 bg-white text-black text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                        {responseData.outfit.bottom.name}
+                      </span>
+                    </div>
                   )}
                 </>
               )}
