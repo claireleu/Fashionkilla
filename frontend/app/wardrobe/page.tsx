@@ -18,6 +18,9 @@ export default function Wardrobe() {
   const [showUpload, setShowUpload] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loadingUpload, setLoadingUpload] = useState(false);
+  const [activeTab, setActiveTab] = useState<
+    "all" | "top" | "bottom" | "dress"
+  >("all");
 
   const fetchCloset = async () => {
     try {
@@ -69,9 +72,14 @@ export default function Wardrobe() {
     }
   };
 
+  const filteredCloset =
+    activeTab === "all"
+      ? closet
+      : closet.filter((item) => item.category.toLowerCase() === activeTab);
+
   return (
-    <div className="min-h-screen bg-striped p-8 relative">
-      <header className="w-full flex justify-between items-center p-6 bg-white shadow-md mb-8 rounded-lg">
+    <div className="min-h-screen bg-striped relative">
+      <header className="w-full flex justify-between items-center p-6 bg-white shadow-md mb-8">
         <div className="flex items-center">
           <Image
             src="/bunny-icon.png"
@@ -90,16 +98,44 @@ export default function Wardrobe() {
       </div>
 
       {/* Clothes */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {closet?.map((item) => (
-          <ClothingCard
-            key={item._id}
-            item={item}
-            onDelete={(itemId) => {
-              setCloset((prev) => prev.filter((i) => i._id !== itemId));
-            }}
-          />
+      <div className="flex gap-4 mb-6 justify-center">
+        {["all", "top", "bottom", "dress"].map((cat) => (
+          <button
+            key={cat}
+            className={`px-4 py-2 rounded ${
+              activeTab === cat
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+            onClick={() => setActiveTab(cat as typeof activeTab)}
+          >
+            {cat.charAt(0).toUpperCase() + cat.slice(1)}
+          </button>
         ))}
+      </div>
+
+      <div
+        className={`${closet.length === 0 ? "" : "bg-white min-h-screen"} p-20`}
+      >
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {filteredCloset?.map((item) => (
+            <ClothingCard
+              key={item._id}
+              item={item}
+              onDelete={(itemId) => {
+                setCloset((prev) => prev.filter((i) => i._id !== itemId));
+              }}
+            />
+          ))}
+        </div>
+        {filteredCloset?.length === 0 && (
+          <div className="text-center py-12 w-full h-full">
+            <p className="text-gray-500 text-lg">
+              This section of your closet is empty
+            </p>
+            <p className="text-gray-400">Add some items to get started!</p>
+          </div>
+        )}
       </div>
 
       {/* Show message if no items */}
