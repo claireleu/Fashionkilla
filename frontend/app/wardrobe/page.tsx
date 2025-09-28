@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState, ChangeEvent, FormEvent } from "react";
 import ClothingCard from "../components/ClothingCard";
+import { Plus } from "lucide-react";
 
 export interface ClosetItem {
   _id: string;
@@ -91,21 +92,19 @@ export default function Wardrobe() {
         </div>
       </header>
 
-      <div className="mb-6">
-        <p className="text-black text-2xl font-bold">
-          Total items: {closet.length}
-        </p>
+      <div className="mb-6 flex items-center justify-center">
+        <p className="text-black text-5xl">Total items: {closet.length}</p>
       </div>
 
       {/* Clothes */}
-      <div className="flex gap-4 mb-6 justify-center">
+      <div className="flex justify-between">
         {["all", "top", "bottom", "dress"].map((cat) => (
           <button
             key={cat}
-            className={`px-4 py-2 rounded ${
+            className={`w-full text-3xl rounded-tl-[45px] p-5 rounded-tr-[45px] ${
               activeTab === cat
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                ? "bg-white text-black"
+                : "bg-white/50 text-gray-500 hover:bg-white/70"
             }`}
             onClick={() => setActiveTab(cat as typeof activeTab)}
           >
@@ -183,11 +182,10 @@ export default function Wardrobe() {
       )}
       {/* Upload button */}
       <div
-        className="fixed left-1/2 bottom-5 transform -translate-x-1/2 bg-[#FFEAEC] rounded-lg shadow-lg flex flex-col items-center justify-center p-2 cursor-pointer hover:bg-[#e8d7d8] transition border-[1.5px] border-black"
+        className="fixed left-1/2 bottom-5 transform -translate-x-1/2 bg-[#FFEAEC] rounded-2xl shadow-xl flex flex-col items-center justify-center p-4 cursor-pointer hover:bg-[#e8d7d8] transition border-[1.5px] border-black"
         onClick={() => setShowUpload(true)}
       >
-        <span className="text-4xl text-black">+</span>
-        <span className="text-black font-semibold">Add Item</span>
+        <Plus className="text-black w-6 h-6" strokeWidth={3} />
       </div>
     </div>
   );
