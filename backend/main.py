@@ -1,9 +1,10 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, Body
 from pydantic import BaseModel
 from typing import List
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sentence_transformers import SentenceTransformer
+from services.remove_background_service import remove_bg_base64
 from services.generate_image_service import convert_prompt_to_images
 from services.mongo_service import (
     delete_clothing,
@@ -51,6 +52,20 @@ last_generated_prompt: List[str] = []  # keep track of generated image prompt
 def root():
     return {"Hello": "World"}
 
+class RemoveBgRequest(BaseModel):
+    image_base64: str
+    content_type: str  # just for testing
+
+@app.post("/remove_bg")
+async def remove_bg_endpoint(request: RemoveBgRequest = Body(...)):
+    try:
+        output_data_uri = remove_bg_base64(request.image_base64, request.content_type)
+        return {"image_base64": output_data_uri}
+    except ValueError as ve:
+        return JSONResponse(status_code=400, content={"error": str(ve)})
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
+
 
 # handles all of turning prompt into image
 @app.post("/submit_outfit_request")
@@ -82,8 +97,9 @@ async def upload_outfit(
 ):
     try:
         file.file.seek(0)
+        print (file.content_type.split("/")[1])
         img_bytes = await file.read()
-        item = create_clothing_item(img_bytes, file.content_type)
+        item = create_clothing_item(img_bytes, file.content_type.split("/")[1])
         return {"status": "success", "item": serialize_item(item)}
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})

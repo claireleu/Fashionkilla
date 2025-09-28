@@ -1,7 +1,8 @@
 import base64
 import numpy as np
-import cv2
 from rembg import remove
+from PIL import Image
+import io
 
 def remove_bg_base64(input_base64: str, content_type: str) -> str:
     # Validate content type
@@ -12,29 +13,26 @@ def remove_bg_base64(input_base64: str, content_type: str) -> str:
     # Decode base64 to bytes
     img_bytes = base64.b64decode(input_base64)
 
-    # Convert bytes to NumPy array for OpenCV
-    nparr = np.frombuffer(img_bytes, np.uint8)
-    img = cv2.imdecode(nparr, cv2.IMREAD_UNCHANGED)  # BGR or BGRA
+    # Open image with PIL and ensure RGBA
+    img = Image.open(io.BytesIO(img_bytes)).convert("RGBA")
 
-    # Convert BGR → RGB if needed
-    if img.shape[2] == 3:
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    # Remove background using rembg
+    result = remove(np.array(img))  # RGBA NumPy array
+    result_img = Image.fromarray(result)
 
-    # Remove background
-    result = remove(img)  # returns RGBA
+    # Prepare output buffer
+    buffer = io.BytesIO()
 
-    # Encode result back to memory
     if content_type == "png":
-        # Keep alpha channel
-        result_bgra = cv2.cvtColor(result, cv2.COLOR_RGBA2BGRA)
-        _, buffer = cv2.imencode(".png", result_bgra)
+        # Keep transparency
+        result_img.save(buffer, format="PNG")
     else:
-        # Convert RGBA → RGB for JPEG
-        result_rgb = cv2.cvtColor(result, cv2.COLOR_RGBA2RGB)
-        _, buffer = cv2.imencode(".jpg", result_rgb)
+        # For JPEG: paste RGBA on white background
+        background = Image.new("RGBA", result_img.size, (255, 255, 255, 255))  # white bg
+        background.paste(result_img, mask=result_img.split()[3])  # use alpha as mask
+        background = background.convert("RGB")  # JPEG doesn't support alpha
+        background.save(buffer, format="JPEG")
 
     # Encode to base64
-    output_base64 = base64.b64encode(buffer).decode("utf-8")
-
-    # Return data URI
+    output_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
     return f"data:image/{content_type};base64,{output_base64}"

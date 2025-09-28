@@ -14,3 +14,4 @@ google-genai
 sentence-transformers
 cohere
 rembg
+onnxruntime==1.15.1

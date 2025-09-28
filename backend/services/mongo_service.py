@@ -9,6 +9,8 @@ from sentence_transformers import SentenceTransformer
 from datetime import datetime, timezone
 from fastapi.encoders import jsonable_encoder
 
+from services.remove_background_service import remove_bg_base64
+
 
 text_model = SentenceTransformer("all-MiniLM-L6-v2")
 
@@ -105,7 +107,8 @@ def create_clothing_item(file_bytes: bytes, content_type: str):
         category = "top"  # change
 
     img_base64 = base64.b64encode(file_bytes).decode("utf-8")
-    img_data_uri = f"data:{content_type or 'image/jpeg'};base64,{img_base64}"
+    img_data_uri = remove_bg_base64(img_base64, content_type)
+    #img_data_uri = f"data:{content_type or 'image/jpeg'};base64,{img_base64}"
 
     # cache text vector embeddings
     keywords = metadata.get("keywords", "")

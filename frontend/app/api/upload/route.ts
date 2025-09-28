@@ -8,6 +8,7 @@ export const POST = async (req: Request) => {
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
+    /*
 
     const maxSize = 10 * 1024 * 1024; // 10MB limit
     if (file.size > maxSize) {
@@ -25,6 +26,7 @@ export const POST = async (req: Request) => {
         { status: 400 }
       );
     }
+      */
 
     const forwardData = new FormData();
     forwardData.append("file", file, file.name);
@@ -36,6 +38,7 @@ export const POST = async (req: Request) => {
       body: forwardData,
     });
 
+    console.log(res)
     if (!res.ok)
       throw new Error(`Upload failed: ${res.status} ${res.statusText}`);
 
