@@ -9,18 +9,19 @@ export interface ClosetItem {
   name: string;
   category: string;
   keywords: string;
+  created_at?: string;
   image_base64: string;
 }
 
 export default function Wardrobe() {
-  const [closet, setCloset] = useState<Record<string, ClosetItem[]>>({});
+  const [closet, setCloset] = useState<ClosetItem[]>([]);
   const [showUpload, setShowUpload] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loadingUpload, setLoadingUpload] = useState(false);
 
   const fetchCloset = async () => {
     try {
-      const res = await fetch("/api/closet");
+      const res = await fetch("/api/sorted_closet");
       const data = await res.json();
       setCloset(data);
     } catch (err) {
@@ -78,21 +79,36 @@ export default function Wardrobe() {
             width={60}
             height={60}
           />
-          <h1 className="text-2xl font-pixel ml-2">Fashionkilla Closet</h1>
+          <p className="text-2xl font-pixel ml-2">Fashionkilla Closet</p>
         </div>
       </header>
 
-      {/* Categories */}
-      {Object.keys(closet).map((category) => (
-        <div key={category} className="mb-12">
-          <h2 className="text-2xl font-bold mb-4 capitalize">{category}</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {closet[category]?.map((item) => (
-              <ClothingCard key={item._id} item={item} />
-            ))}
-          </div>
+      <div className="mb-6">
+        <p className="text-black text-2xl font-bold">
+          Total items: {closet.length}
+        </p>
+      </div>
+
+      {/* Clothes */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        {closet?.map((item) => (
+          <ClothingCard
+            key={item._id}
+            item={item}
+            onDelete={(itemId) => {
+              setCloset((prev) => prev.filter((i) => i._id !== itemId));
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Show message if no items */}
+      {closet.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-gray-500 text-lg">Your closet is empty</p>
+          <p className="text-gray-400">Add some items to get started!</p>
         </div>
-      ))}
+      )}
 
       {/* Upload Modal */}
       {showUpload && (
@@ -101,7 +117,7 @@ export default function Wardrobe() {
             className="bg-white rounded-lg p-6 flex flex-col gap-4 w-80"
             onSubmit={handleUpload}
           >
-            <h2 className="text-xl font-bold mb-2">Upload Clothing</h2>
+            <p className="text-xl font-bold mb-2">Upload Clothing</p>
             <input
               type="file"
               accept="image/*"
