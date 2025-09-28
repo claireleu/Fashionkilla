@@ -8,27 +8,32 @@ export default function MainPage() {
   const [inputValue, setInputValue] = useState("");
   const [responseData, setResponseData] = useState<any | null>(null);
   const [responseState, setResponseState] = useState<any | false>(false);
-  const [outfitImages, setOutfitImages] = useState<{ top?: string; bottom?: string }>({});
+  const [outfitImages, setOutfitImages] = useState<{
+    top?: string;
+    bottom?: string;
+  }>({});
   const [dressImage, setDressImage] = useState<{ dress?: string }>({});
   const [dressState, setDressState] = useState(false);
   const router = useRouter();
 
   const submitPrompt = async () => {
-    console.log("submitting response")
-
+    console.log("submitting response");
 
     if (!inputValue.trim()) return; // ignore empty input
 
     setResponseState(true);
 
     try {
-      const response = await fetch("http://localhost:8000/submit_outfit_request", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt: inputValue }),
-      });
+      const response = await fetch(
+        "http://localhost:8000/submit_outfit_request",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ prompt: inputValue }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to send prompt");
@@ -51,7 +56,6 @@ export default function MainPage() {
         //console.log("got bottom image", bottomImg);
 
         setDressImage({}); // clear any previous dress
-
       } else if (data.outfit.dress) {
         setDressState(true);
 
@@ -60,7 +64,6 @@ export default function MainPage() {
         //console.log("got dress image", dressImg);
         setOutfitImages({}); // clear any previous top/bottom
       }
-
     } catch (error) {
       console.error("Error:", error);
     }
@@ -73,26 +76,27 @@ export default function MainPage() {
   };
 
   const fetchImageById = async (id: string) => {
-  try {
-    const response = await fetch(`http://localhost:8000/get_item_image/${id}`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch image");
+    try {
+      const response = await fetch(
+        `http://localhost:8000/get_item_image/${id}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch image");
+      }
+      const data = await response.json();
+      console.log("successfully festched _id image:", data.image_base64);
+      return data.image_base64; // header already prepended
+    } catch (error) {
+      console.error("Error fetching image:", error);
+      return null;
     }
-    const data = await response.json();
-    console.log("successfully festched _id image:", data.image_base64);
-    return data.image_base64; // header already prepended
-  } catch (error) {
-    console.error("Error fetching image:", error);
-    return null;
-  }
-};
-
+  };
 
   const handleCloseResponse = () => {
     setResponseData(null);
     setResponseState(false);
     setInputValue("");
-  }
+  };
 
   const handleViewWardrobe = () => {
     router.push("/wardrobe"); // Navigate to the wardrobe page
@@ -201,7 +205,7 @@ export default function MainPage() {
         <div className="flex flex-col items-center bg-white p-8 rounded-lg shadow-lg w-[350px]">
           <div className="w-full">
             <h2 className="text-2xl font-bold mb-6">
-              What would you like to wear today?
+              What would you like to dress for today?
             </h2>
             <input
               type="text"
@@ -211,19 +215,21 @@ export default function MainPage() {
               placeholder="Enter a style or event..."
               readOnly={responseState}
               className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300 mb-6 text-lg ${
-              responseState ? "text-gray-400 bg-gray-100 cursor-not-allowed" : "text-black bg-white"
+                responseState
+                  ? "text-gray-400 bg-gray-100 cursor-not-allowed"
+                  : "text-black bg-white"
               }`}
             />
             <button
               onClick={submitPrompt}
-              className="w-full bg-beige text-white py-3 rounded-lg hover:bg-beige-dark hover:shadow-lg transition-all text-lg"
+              className="w-full bg-[#d4bfa3] hover:bg-[#c2b499] hover:cursor-pointer text-white py-3 rounded-lg hover:bg-beige-dark hover:shadow-lg transition-all text-lg"
             >
               Submit
             </button>
           </div>
           <button
             onClick={handleViewWardrobe}
-            className="mt-6 w-full bg-beige text-white py-3 rounded-lg hover:bg-beige-dark hover:shadow-lg transition-all text-lg"
+            className="mt-6 w-full bg-[#d4bfa3] hover:bg-[#c2b499] hover:cursor-pointer text-white py-3 rounded-lg hover:bg-beige-dark hover:shadow-lg transition-all text-lg"
           >
             <Image
               src="/hanger-icon.png"

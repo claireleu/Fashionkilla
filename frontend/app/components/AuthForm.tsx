@@ -34,7 +34,12 @@ export default function AuthForm({
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-striped">
       <div className="flex items-center justify-center mb-8">
-        <Image src="/bunny-icon.png" alt="Bunny Icon" width={200} height={200} />
+        <Image
+          src="/bunny-icon.png"
+          alt="Bunny Icon"
+          width={200}
+          height={200}
+        />
         <h1 className="text-7xl font-pixel ml-4">Fashionkilla</h1>
       </div>
       <form className="bg-white p-6 rounded-lg shadow-md w-80 justify-center">
@@ -74,7 +79,7 @@ export default function AuthForm({
         <button
           type="button"
           onClick={handleButtonClick}
-          className="w-full bg-beige text-white py-2 rounded-lg hover:shadow-lg transition-all"
+          className="w-full bg-[#d4bfa3] text-white py-2 rounded-lg hover:shadow-lg transition-all hover:cursor-pointer hover:bg-[#c2b499]"
         >
           {buttonText}
         </button>

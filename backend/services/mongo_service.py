@@ -108,7 +108,7 @@ def create_clothing_item(file_bytes: bytes, content_type: str):
 
     img_base64 = base64.b64encode(file_bytes).decode("utf-8")
     img_data_uri = remove_bg_base64(img_base64, content_type)
-    #img_data_uri = f"data:{content_type or 'image/jpeg'};base64,{img_base64}"
+    # img_data_uri = f"data:{content_type or 'image/jpeg'};base64,{img_base64}"
 
     # cache text vector embeddings
     keywords = metadata.get("keywords", "")
