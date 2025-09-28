@@ -120,6 +120,5 @@ def update_text_embedding(obj_id: str, embedding: list[float]):
     mongo_id = ObjectId(obj_id)
 
     return clothes_collection.update_one(
-        {"_id": mongo_id},
-        {"$set": {"text_embedding": embedding}}
+        {"_id": mongo_id}, {"$set": {"text_embedding": embedding}}
     )

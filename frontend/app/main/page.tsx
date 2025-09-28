@@ -61,7 +61,7 @@ export default function MainPage() {
   }
 
   const handleViewWardrobe = () => {
-    router.push("/closet"); // Navigate to the wardrobe page
+    router.push("/wardrobe"); // Navigate to the wardrobe page
   };
 
   const handleLogout = () => {
@@ -74,7 +74,12 @@ export default function MainPage() {
       {/* Header */}
       <header className="w-full flex justify-between items-center p-6 bg-white shadow-md">
         <div className="flex items-center">
-          <Image src="/bunny-icon.png" alt="Bunny Icon" width={60} height={60} />
+          <Image
+            src="/bunny-icon.png"
+            alt="Bunny Icon"
+            width={60}
+            height={60}
+          />
           <h1 className="text-2xl font-pixel ml-2">Fashionkilla</h1>
         </div>
         <button
@@ -124,7 +129,9 @@ export default function MainPage() {
         {/* Prompt Section */}
         <div className="flex flex-col items-center bg-white p-8 rounded-lg shadow-lg w-[350px]">
           <div className="w-full">
-            <h2 className="text-2xl font-bold mb-6">What would you like to wear today?</h2>
+            <h2 className="text-2xl font-bold mb-6">
+              What would you like to wear today?
+            </h2>
             <input
               type="text"
               value={inputValue}
@@ -147,7 +154,13 @@ export default function MainPage() {
             onClick={handleViewWardrobe}
             className="mt-6 w-full bg-beige text-white py-3 rounded-lg hover:bg-beige-dark hover:shadow-lg transition-all text-lg"
           >
-            <Image src="/hanger-icon.png" alt="Hanger Icon" width={30} height={30} className="mr-2 inline" />
+            <Image
+              src="/hanger-icon.png"
+              alt="Hanger Icon"
+              width={30}
+              height={30}
+              className="mr-2 inline"
+            />
             View Wardrobe
           </button>
         </div>
