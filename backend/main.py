@@ -11,6 +11,7 @@ from services.mongo_service import (
     get_closet_grouped_no_embeddings,
     serialize_item,
     create_clothing_item,
+    get_image_by_id,
     get_sorted_time_closet
 )
 from services.recommendation_service import recommend_best_items
@@ -113,3 +114,11 @@ async def delete_outfit(item_id: str):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+# get image by id
+@app.get("/get_item_image/{item_id}")
+async def getting_image_by_id(item_id: str):
+    image_base64 = get_image_by_id(item_id)
+    if image_base64 is None:
+        raise HTTPException(status_code=404, detail="Image not found")
+    return {"image_base64": image_base64}

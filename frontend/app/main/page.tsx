@@ -8,14 +8,10 @@ export default function MainPage() {
   const [inputValue, setInputValue] = useState("");
   const [responseData, setResponseData] = useState<any | null>(null);
   const [responseState, setResponseState] = useState<any | false>(false);
+  const [outfitImages, setOutfitImages] = useState<{ top?: string; bottom?: string }>({});
+  const [dressImage, setDressImage] = useState<{ dress?: string }>({});
+  const [dressState, setDressState] = useState(false);
   const router = useRouter();
-
-  const handleSuggestionClick = (suggestion: string) => {
-    console.log(`Suggestion clicked: ${suggestion}`);
-    // Placeholder function to handle suggestion click
-  };
-
-  
 
   const submitPrompt = async () => {
     console.log("submitting response")
@@ -42,6 +38,29 @@ export default function MainPage() {
       console.log("Backend response:", data);
       setResponseData(data);
 
+      if (data.outfit.top && data.outfit.bottom) {
+        setDressState(false);
+
+        const [topImg, bottomImg] = await Promise.all([
+          fetchImageById(data.outfit.top._id),
+          fetchImageById(data.outfit.bottom._id),
+        ]);
+
+        setOutfitImages({ top: topImg || "", bottom: bottomImg || "" });
+        console.log("got top image", topImg);
+        console.log("got bottom image", bottomImg);
+
+        setDressImage({}); // clear any previous dress
+
+      } else if (data.outfit.dress) {
+        setDressState(true);
+
+        const dressImg = await fetchImageById(data.outfit.dress._id);
+        setDressImage({ dress: dressImg || "" });
+        console.log("got dress image", dressImg);
+        setOutfitImages({}); // clear any previous top/bottom
+      }
+
     } catch (error) {
       console.error("Error:", error);
     }
@@ -52,6 +71,21 @@ export default function MainPage() {
       submitPrompt();
     }
   };
+
+  const fetchImageById = async (id: string) => {
+  try {
+    const response = await fetch(`http://localhost:8000/get_item_image/${id}`);
+    if (!response.ok) {
+      throw new Error("Failed to fetch image");
+    }
+    const data = await response.json();
+    console.log("successfully festched _id image:", data.image_base64);
+    return data.image_base64; // header already prepended
+  } catch (error) {
+    console.error("Error fetching image:", error);
+    return null;
+  }
+};
 
 
   const handleCloseResponse = () => {
@@ -103,8 +137,35 @@ export default function MainPage() {
             </button>
             <div className="text-center">
               <h2 className="text-2xl font-bold mb-4">Outfit Suggestions</h2>
-              <pre className="text-left text-sm">{JSON.stringify(responseData.outfit.top.name, null, 2)}</pre>
-              <pre className="text-left text-sm">{JSON.stringify(responseData.outfit.bottom.name, null, 2)}</pre>
+
+              {dressState ? (
+                // Show only dress
+                dressImage.dress && (
+                  <img
+                    src={dressImage.dress}
+                    alt="Dress"
+                    className="max-h-64 mx-auto"
+                  />
+                )
+              ) : (
+                // Show top and bottom
+                <>
+                  {outfitImages.top && (
+                    <img
+                      src={outfitImages.top}
+                      alt="Top"
+                      className="max-h-48 mx-auto mb-4"
+                    />
+                  )}
+                  {outfitImages.bottom && (
+                    <img
+                      src={outfitImages.bottom}
+                      alt="Bottom"
+                      className="max-h-48 mx-auto"
+                    />
+                  )}
+                </>
+              )}
             </div>
           </div>
         ) : (
